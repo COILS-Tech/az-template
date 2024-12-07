@@ -1,10 +1,63 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {},
+    "parameters": {
+        "name-of-web-app": {
+            "type": "string",
+            "metadata": {
+                "description": "Enter the name of the web application"
+            }
+        },
+        "name-of-app-service-plan": {
+            "type": "string",
+            "metadata": {
+                "description": "Enter the name of the app service plan"
+            }
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "Enter the location of the app service"
+            }
+        }
+    },
     "functions": [],
     "variables": {},
     "resources": [
+        {
+            "name": "[parameters('name-of-web-app')]",
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2024-04-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/appServicePlan1')]": "Resource",
+                "displayName": "[parameters('name-of-web-app')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('name-of-app-service-plan'))]"
+            ],
+            "properties": {
+                "name": "[parameters('name-of-web-app')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('name-of-app-service-plan'))]"
+            }
+        },
+        {
+            "name": "[parameters('name-of-app-service-plan')]",
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2024-04-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "F1",
+                "capacity": 1
+            },
+            "tags": {
+                "displayName": "[parameters('name-of-app-service-plan')]"
+            },
+            "properties": {
+                "name": "[parameters('name-of-app-service-plan')]"
+            }
+        }
+        
     ],
     "outputs": {}
 }
